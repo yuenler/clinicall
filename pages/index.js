@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { initializeApp } from "firebase/app";
 import { useAppContext } from '../context/Context';
+import icon from '../public/icon.png';
+import Image from 'next/image';
 
 
 // Your web app's Firebase configuration
@@ -27,8 +29,6 @@ export async function getCalendarItems(body) {
     body: body,
   });
   const data = await res.json();
-  console.log(data);
-  console.log("events:", data.events);
   localStorage.setItem("google_tokens", JSON.stringify(data.token));
   return data.events;
 }
@@ -41,7 +41,6 @@ export default function Home() {
 
   useEffect(async () => {
     const user_tokens = localStorage.getItem("google_tokens");
-    console.log(user_tokens);
     if (user_tokens) {
       router.push("/profile");
       await getCalendarItems(user_tokens);
@@ -67,22 +66,25 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-green-500 to-teal-500">
-      <div className="text-center">
-        <h1 className="text-6xl font-bold text-white mb-4">
-          Welcome to the Patient Booker.
-        </h1>
-        <p className="text-xl text-white mb-8">
-          Book appointments with your doctor automatically with AI.
-        </p>
-        <button
-          onClick={handleSignIn}
-          className="bg-white text-gray-800 font-semibold py-2 px-4 border border-transparent rounded-lg shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-400 transition duration-150 ease-in-out"
-        >
-          Sign up with Google
-        </button>
+    <div className="min-h-screen bg-gradient-to-r from-purple-500 to-teal-500 flex items-center justify-center">
+      <div className="transition duration-300 ease-in-out transform hover:scale-105 max-w-md w-full bg-white shadow-2xl rounded-lg p-8">
+        <div className="text-center">
+          <div className="mb-8">
+            <Image src={icon} alt="icon" width={300} height={300} />
+          </div>
+          <p className="text-xl mb-8 font-bold" style={{ fontFamily: 'Arial, sans-serif' }}>
+            Find a doctor and book an appointment automatically with AI.
+          </p>
+          <button
+            onClick={handleSignIn}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 border border-blue-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out"
+          >
+            Sign up with Google
+          </button>
+        </div>
       </div>
     </div>
+
   );
 
 }

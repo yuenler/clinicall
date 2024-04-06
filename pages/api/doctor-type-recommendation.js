@@ -31,7 +31,6 @@ export default async function handler(req, res) {
         model: 'gpt-4-0125-preview',
       });
       const responseText = response.choices[0].message.content
-      console.log('OpenAI response:', responseText);
 
       resolve({ doctorType: responseText });
 

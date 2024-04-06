@@ -45,7 +45,6 @@ export default async function handler(req, res) {
   } else {
     tokens = req.body;
   }
-  console.log("tokens", tokens);
   auth.setCredentials(tokens);
 
   let events = await listEvents(auth);
