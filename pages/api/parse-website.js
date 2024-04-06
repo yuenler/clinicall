@@ -1,16 +1,8 @@
-// pages/api/parse-pdf.js
+// pages/api/requirements-fulfillment.js
 import 'dotenv/config'
-import { IncomingForm } from 'formidable';
 import OpenAI from 'openai';
-import fs from 'fs';
-import pdfParse from 'pdf-parse';
 
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -21,62 +13,165 @@ export default async function handler(req, res) {
     apiKey: process.env['OPENAI_API_KEY'],
   });
 
-  const data = await new Promise((resolve, reject) => {
-    const form = new IncomingForm();
-    form.parse(req, async (err, fields, files) => {
-      if (err) return reject(err);
-      const filePath = files.file[0].filepath;
-      try {
-
-        const fileBuffer = fs.readFileSync(filePath); // Read the file into a buffer
-        pdfParse(fileBuffer).then(async function (data) {
-          // Here you would typically parse the PDF content to extract text
-          // For demonstration, assume `fileContent` is directly usable or has been converted to text
-          console.log('Parsed file content:', data.text);
-          const response = await openai.chat.completions.create({
-            messages: [{
-              role: 'user', content: `
-              Given this information about doctors available, please parse the data and return it as a JSON list.
-
-              Example:
-              [
-                {
-                  "name": "Dr. Smith",
-                  "specialty": "Cardiology",
-                  "location": "123 Main St",
-                  "phone": "123-456-7890",
-                  "otherInfo": "Additional information here"
-                },
-                {
-                  "name": "Dr. Johnson",
-                  "specialty": "Dermatology",
-                  "location": "456 Elm St",
-                  "phone": "234-567-8901",
-                  "otherInfo": "Additional information here"
-                }
-              ]
-              
-              Information to parse:
-            
-            ${data.text}`
-            }],
-            model: 'gpt-4-0125-preview',
-          });
-          const responseText = response.choices[0].message.content
-          console.log('OpenAI response:', responseText);
-          // parse response for first and last bracket
-          const firstBracketIndex = responseText.indexOf('[');
-          const lastBracketIndex = responseText.lastIndexOf(']');
-          const jsonContent = responseText.slice(firstBracketIndex, lastBracketIndex + 1);
-          // convert to JSON
-          const json = JSON.parse(jsonContent);
-          resolve(json);
-        });
-      } catch (error) {
-        reject(error);
+  const doctors =
+    [
+      {
+        "name": "Megan L Cope, OD",
+        "specialty": "Optometry",
+        "location": "1276 Massachusetts Avenue Cambridge, MA 02138",
+        "phone": "617-868-1500",
+        "otherInfo": "In Network, Accepting New Patients"
+      },
+      {
+        "name": "Harvard Square Eye Care",
+        "specialty": "Optometry",
+        "location": "19 Dunster Street Cambridge, MA 02138",
+        "phone": "617-354-5590",
+        "otherInfo": "In Network, Accepting New Patients"
+      },
+      {
+        "name": "Amanda K Wiederoder, OD",
+        "specialty": "Optometry",
+        "location": "19 Dunster Street Cambridge, MA 02138",
+        "phone": "617-354-5590",
+        "otherInfo": "Telehealth, In Network, Accepting New Patients"
+      },
+      {
+        "name": "Lauren J Dickerman, OD",
+        "specialty": "Optometry",
+        "location": "19 Dunster Street Cambridge, MA 02138",
+        "phone": "617-354-5590",
+        "otherInfo": "In Network, Accepting New Patients"
+      },
+      {
+        "name": "Lawrence A Phillips, OD",
+        "specialty": "Optometry",
+        "location": "1077 Massachusetts Avenue Cambridge, MA 02138",
+        "phone": "617-547-3310",
+        "otherInfo": "In Network, Accepting New Patients"
+      },
+      {
+        "name": "Lunette Cambridge PC",
+        "specialty": "Optometry",
+        "location": "35 Brattle Street Cambridge, MA 02138",
+        "phone": "617-714-6600",
+        "otherInfo": "In Network, Accepting New Patients"
+      },
+      {
+        "name": "Michelle F Rahimian, OD",
+        "specialty": "Optometry",
+        "location": "35 Brattle Street Cambridge, MA 02138",
+        "phone": "617-714-6600",
+        "otherInfo": "In Network, Accepting New Patients"
+      },
+      {
+        "name": "Stivia Demiri, OD",
+        "specialty": "Optometry",
+        "location": "35 Brattle Street Cambridge, MA 02138",
+        "phone": "617-714-6600",
+        "otherInfo": "In Network, Accepting New Patients"
+      },
+      {
+        "name": "Fotini Kostogiannis, OD",
+        "specialty": "Optometry",
+        "location": "One Brattle Square Suite A2 Cambridge, MA 02138",
+        "phone": "617-547-6080",
+        "otherInfo": "In Network, Accepting New Patients"
+      },
+      {
+        "name": "Ariadne I Rowe, OD",
+        "specialty": "Optometry",
+        "location": "One Brattle Square Cambridge, MA 02138",
+        "phone": "617-547-6080",
+        "otherInfo": "In Network, Accepting New Patients"
+      },
+      {
+        "name": "Tiffany Lu, OD",
+        "specialty": "Optometry",
+        "location": "12 Eliot Street Cambridge, MA 02138",
+        "phone": "617-354-3303",
+        "otherInfo": "In Network, Accepting New Patients"
+      },
+      {
+        "name": "Vivek B Mallampalli, OD",
+        "specialty": "Optometry",
+        "location": "12 Eliot Street Cambridge, MA 02138",
+        "phone": "617-354-3303",
+        "otherInfo": "In Network, Accepting New Patients"
+      },
+      {
+        "name": "Murray H Baumal, OD",
+        "specialty": "Optometry",
+        "location": "12 Eliot Street Cambridge, MA 02138",
+        "phone": "617-354-3303",
+        "otherInfo": "In Network, Accepting New Patients"
+      },
+      {
+        "name": "Gabrielle C Nivar, OD",
+        "specialty": "Optometry",
+        "location": "12 Eliot Street Cambridge, MA 02138",
+        "phone": "617-354-3303",
+        "otherInfo": "Telehealth, In Network, Accepting New Patients"
+      },
+      {
+        "name": "Nguyet Lesoltis, OD",
+        "specialty": "Optometry",
+        "location": "12 Eliot Street Cambridge, MA 02138",
+        "phone": "617-354-3303",
+        "otherInfo": "Telehealth, In Network, Accepting New Patients"
+      },
+      {
+        "name": "David M Luria, OD",
+        "specialty": "Optometry",
+        "location": "12 Eliot Street Cambridge, MA 02138",
+        "phone": "617-354-3310",
+        "otherInfo": "In Network, Accepting New Patients"
+      },
+      {
+        "name": "Samira S Mortazavi, OD",
+        "specialty": "Optometry",
+        "location": "1575 Cambridge Street Cambridge, MA 02138",
+        "phone": "617-876-4344",
+        "otherInfo": "Telehealth, In Network, Accepting New Patients"
+      },
+      {
+        "name": "Asha Meloottu, OD",
+        "specialty": "Optometry",
+        "location": "1575 Cambridge Street Cambridge, MA 02138",
+        "phone": "617-876-4344",
+        "otherInfo": "Telehealth, In Network, Accepting New Patients"
+      },
+      {
+        "name": "Kathleen Murphy, OD",
+        "specialty": "Optometry",
+        "location": "50 Prospect Street Cambridge, MA 02139",
+        "phone": "617-349-3937",
+        "otherInfo": "In Network, Accepting New Patients"
       }
-    });
+    ]
+
+
+  const { insurance, patientDetails } = req.body;
+
+
+  const data = await new Promise(async (resolve, reject) => {
+    try {
+
+      // temporary response, return a random sample of 5 doctors from the insurance data
+      const data = doctors;
+
+      // wait 5 seconds to simulate a slow response
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      resolve(data);
+
+    } catch (error) {
+      reject(error);
+    }
   });
 
   res.status(200).json(data);
 }
+
+
+

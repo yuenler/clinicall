@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import InsurancePageUploader from '../components/InsurancePageUploader';
 import { useAppContext } from '../context/Context';
+import Select from 'react-select';
+
 
 export default function PatientInfo() {
   const [homeAddress, setHomeAddress] = useState('');
@@ -10,6 +12,7 @@ export default function PatientInfo() {
   const [patientRequest, setPatientRequest] = useState('');
   const [step, setStep] = useState(1);
   const [doctorType, setDoctorType] = useState(null);
+  const [transportType, setTransportType] = useState(null);
 
   const { setWebsiteData, setPatientDetails } = useAppContext();
   const router = useRouter();
@@ -58,7 +61,9 @@ export default function PatientInfo() {
       homeAddress,
       workAddress,
       workHours,
+      transportType,
       patientRequest,
+      doctorType,
     };
     setPatientDetails(patientProfile);
     router.push('/findBestDoctor');
@@ -76,10 +81,11 @@ export default function PatientInfo() {
               <textarea
                 id="patientRequest"
                 name="patientRequest"
-                placeholder="Describe your symptoms, preferred doctor, or anything else."
+                style={{ height: '200px' }}
+                placeholder="Please describe your medical needs. Include any symptoms you're experiencing, how long you've been experiencing them, and any other relevant information."
                 value={patientRequest}
                 onChange={(e) => setPatientRequest(e.target.value)}
-                className="p-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                className="p-5 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
               />
               <button
                 type="button"
@@ -96,7 +102,7 @@ export default function PatientInfo() {
                   We recommend you see a <strong>{doctorType}</strong> based on your medical needs.
                 </div>
               )}
-              <InsurancePageUploader onUploadComplete={onUploadComplete} />
+              {/* <InsurancePageUploader onUploadComplete={onUploadComplete} /> */}
               <div className="flex items-center mb-4">
                 <input
                   type="text"
@@ -127,9 +133,30 @@ export default function PatientInfo() {
                 <input
                   type="text"
                   placeholder="Work hours"
-                  value={workAddress}
+                  value={workHours}
                   onChange={(e) => setWorkHours(e.target.value)}
                   className="p-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  How do you get to work?
+                </label>
+
+                <Select
+                  options={[
+                    { value: 'car', label: 'Car' },
+                    { value: 'publicTransport', label: 'Public Transport' },
+                    { value: 'bike', label: 'Bike' },
+                    { value: 'walk', label: 'Walk' },
+                  ]}
+                  onChange={(selectedOption) => {
+                    setTransportType(selectedOption.value);
+                  }}
+                  placeholder="Select a transport type"
+                  isClearable
+                  isSearchable
                 />
               </div>
 
