@@ -6,7 +6,7 @@ const AppContext = createContext();
 export const useAppContext = () => useContext(AppContext);
 
 export const ContextProvider = ({ children }) => {
-  const [insuranceData, setInsuranceData] = useState({});
+  const [insuranceData, setInsuranceData] = useState([]);
   const [patientDetails, setPatientDetails] = useState({});
   const [websiteData, setWebsiteData] = useState({});
 

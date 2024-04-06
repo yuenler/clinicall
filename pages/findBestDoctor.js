@@ -5,20 +5,21 @@ import { useRouter } from 'next/router';
 
 function FindBestDoctor() {
   const [loading, setLoading] = useState(false);
-  const { websiteData, insuranceData, setInsuranceData } = useAppContext();
+  const { websiteData, insuranceData, setInsuranceData, patientDetails } = useAppContext();
+  const [showAlert, setShowAlert] = useState(false);
 
   const router = useRouter();
 
   useEffect(() => {
-    const fetchRubric = async () => {
-      if (!websiteData) {
-        router.push('/profile');
-        return;
-      }
-      setLoading(true);
+    if (!websiteData) {
+      router.push('/profile');
+      return;
+    }
+    setLoading(true);
 
-      const formData = new FormData();
-      formData.append('file', websiteData);
+    const formData = new FormData();
+    formData.append('file', websiteData);
+    const fetchData = async () => {
       const response = await fetch('/api/parse-website', {
         method: 'POST',
         body: formData,
@@ -26,10 +27,31 @@ function FindBestDoctor() {
       const data = await response.json();
       setInsuranceData(data);
       setLoading(false);
+
+      // Check if doctors exceed 10 to show alert
+      if (data.length > 10) {
+        setShowAlert(true);
+      }
     };
 
-    fetchRubric();
+    fetchData();
   }, [websiteData]);
+
+  const handleCallDoctor = async (doctor) => {
+    const response = await fetch('/api/call-doctor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        phoneNumber: doctor.phone,
+        insurance: insuranceData,
+        patientRequest: patientDetails.patientRequest,
+      }),
+    });
+
+    // Handle response here, e.g., show a success message
+  };
 
   if (loading) {
     return (
@@ -44,15 +66,35 @@ function FindBestDoctor() {
 
   return (
     <div className="flex flex-col items-center justify-center p-4">
-      <h1 className="text-xl font-bold mb-4">Here's what I found from what you've uploaded:</h1>
+
+      {showAlert && (
+        <div
+          className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 m-5" role="alert"
+        >
+          <div>
+            It looks like you've provided a lot of doctors to choose from! Would you like me to do some research on them to filter it down to just a few?
+          </div>
+          <div>
+            <button
+              className='bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded mt-2'
+            >
+              Research doctors and filter them down for me
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-4">
-        {insuranceData && insuranceData.map((doctor, index) => (
+        {insuranceData && insuranceData.length > 0 && insuranceData.map((doctor, index) => (
           <div key={index} className="border rounded-lg p-4 shadow-md">
             <h2 className="text-lg font-semibold">{doctor.name}</h2>
             <p>Specialty: {doctor.specialty}</p>
             <p>Location: {doctor.location}</p>
             <p>Phone: {doctor.phone}</p>
             <p>{doctor.otherInfo}</p>
+            <button
+              className="mt-3 bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded"
+              onClick={() => handleCallDoctor(doctor)}>Call them for me</button>
           </div>
         ))}
       </div>
