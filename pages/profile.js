@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import InsurancePageUploader from '../components/InsurancePageUploader';
 import { useAppContext } from '../context/Context';
-import Select from 'react-select';
 
 
 export default function PatientInfo() {
   const [homeAddress, setHomeAddress] = useState('');
   const [workAddress, setWorkAddress] = useState('');
-  const [workHours, setWorkHours] = useState('');
   const [patientRequest, setPatientRequest] = useState('');
   const [step, setStep] = useState(1);
   const [doctorType, setDoctorType] = useState(null);
-  const [transportType, setTransportType] = useState(null);
   const [deadline, setDeadline] = useState('');
 
   const { setWebsiteData, setPatientDetails } = useAppContext();
@@ -61,14 +57,12 @@ export default function PatientInfo() {
     const patientProfile = {
       homeAddress,
       workAddress,
-      workHours,
-      transportType,
       patientRequest,
       doctorType,
       deadline,
     };
     setPatientDetails(patientProfile);
-    router.push('/findBestDoctor');
+    router.push('/doctor');
   };
 
   return (
@@ -140,42 +134,6 @@ export default function PatientInfo() {
                     <circle cx="12" cy="9" r="3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
                   </svg>
                 </button>
-              </div>
-
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  When do you work? (Example response: Mon-Thurs 9-5, but I leave early at 3 on Fridays)
-                </label>
-
-                <input
-                  type="text"
-                  placeholder="Work hours"
-                  value={workHours}
-                  onChange={(e) => setWorkHours(e.target.value)}
-                  className="p-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  How do you get to work?
-                </label>
-
-                <Select
-                  options={[
-                    { value: 'car', label: 'Car' },
-                    { value: 'publicTransport', label: 'Public Transport' },
-                    { value: 'bike', label: 'Bike' },
-                    { value: 'walk', label: 'Walk' },
-                  ]}
-                  onChange={(selectedOption) => {
-                    setTransportType(selectedOption.value);
-                  }}
-                  placeholder="Select a transport type"
-                  isClearable
-                  isSearchable
-                />
               </div>
 
               <div className="flex items-center mb-4">

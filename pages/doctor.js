@@ -3,6 +3,9 @@ import { useAppContext } from '../context/Context';
 import { ThreeDots } from 'react-loader-spinner';
 import { useRouter } from 'next/router';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { FiInfo, FiPhoneCall } from 'react-icons/fi'; // Importing an info icon from react-icons
+import CallDoctorModal from './components/CallDoctorModal';
+import FilterDoctorsCard from './components/FilterDoctorsCard';
 
 // Function to help reorder the list
 const reorder = (list, startIndex, endIndex) => {
@@ -11,61 +14,6 @@ const reorder = (list, startIndex, endIndex) => {
   result.splice(endIndex, 0, removed);
   return result;
 };
-function CallDoctorModal({ doctor, onCancel, isVisible, timer, userAvailability, callResults }) {
-  if (!isVisible) return null;
-
-  // Helper function to format dates
-  const formatDate = (date) => {
-    return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
-      <div className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center"
-        style={{ maxWidth: '400px', width: '90%' }}>
-        <h2 className="text-indigo-800 font-semibold text-xl mb-4">{doctor.name}</h2>
-
-        {userAvailability.length > 0 ? (
-          <>
-            <p className="text-sm text-gray-600 mb-2">Please verify that your availability is accurate before proceeding.</p>
-            <div className="bg-indigo-50 p-4 rounded-lg mb-4 w-full">
-              <p className="text-indigo-800 mb-2">Your available times:</p>
-              <ul className="list-disc pl-5 text-sm">
-                {userAvailability.map((availability, index) => (
-                  <li key={index} className="text-gray-700">
-                    {formatDate(availability.start)} - {formatDate(availability.end)}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </>
-        ) : (
-          <p className="text-gray-700 mb-2">Determining your availability based on your calendar and doctor's distance...</p>
-        )}
-
-        {userAvailability.length > 0 && timer > 0 && (
-          <p className="text-green-600 mb-2 font-semibold">Calling in {timer}...</p>
-        )}
-
-        {userAvailability.length > 0 && timer == 0 && callResults === "" && (
-          <p className="text-red-500 mb-2 font-semibold">Call ongoing...</p>
-        )}
-
-        {callResults && (
-          <p className="text-red-500 mb-2">{callResults}</p>
-        )}
-
-
-        <button
-          className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-6 rounded transition duration-150 ease-in-out"
-          onClick={onCancel}
-        >
-          Cancel Call
-        </button>
-      </div>
-    </div>
-  );
-}
 
 function FindBestDoctor() {
   const [loading, setLoading] = useState(false);
@@ -76,15 +24,21 @@ function FindBestDoctor() {
   const [selectedDoctors, setSelectedDoctors] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentDoctorBeingCalled, setCurrentDoctorBeingCalled] = useState(null);
-  const [userAvailability, setUserAvailability] = useState([]);
   const [timer, setTimer] = useState(10);
   const [callResults, setCallResults] = useState('')
-
-
+  const [isHovering, setIsHovering] = useState(false);
+  const [transportType, setTransportType] = useState(null);
+  const [travelTime, setTravelTime] = useState(null);
+  const [calling, setCalling] = useState(false);
 
   const cancelCall = () => {
+    const confirmation = confirm('Are you sure you want to cancel the call? This will hang up on the current doctor office it is calling.');
+    if (!confirmation) return;
+
     setIsModalVisible(false);
+    setCalling(false);
   };
+
 
   const router = useRouter();
 
@@ -107,7 +61,7 @@ function FindBestDoctor() {
       return;
     }
     setLoading(true);
-    setLoadingText('Searching for ' + patientDetails.doctorType + 's...');
+    setLoadingText(`Searching for ${patientDetails.doctorType ?? 'doctor'}s...`);
 
     const formData = new FormData();
     formData.append('file', websiteData);
@@ -139,9 +93,13 @@ function FindBestDoctor() {
 
   // function to call all doctors in the list in order here
   const callDoctors = async () => {
+    if (selectedDoctors.length === 0) {
+      alert('Please select doctors to call.');
+      return;
+    }
+    setCalling(true);
     for (let i = 0; i < selectedDoctors.length; i++) {
       setTimer(10);
-      setUserAvailability([]);
       setCallResults('');
       await handleCallDoctor(selectedDoctors[i]);
     }
@@ -149,18 +107,9 @@ function FindBestDoctor() {
 
   const handleCallDoctor = async (doctor) => {
     setCurrentDoctorBeingCalled(doctor);
-    setIsModalVisible(true);
 
-    // wait 5 seconds to simulate getting user availability
-
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    setUserAvailability([
-      { start: '2024-10-01T09:00:00', end: '2024-10-01T10:00:00' },
-      { start: '2024-10-01T11:00:00', end: '2024-10-01T12:00:00' },
-    ]);
 
     // wait 10 seconds to give user time to cancel the call, update timer
-
     for (let i = 0; i < 10; i++) {
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -211,43 +160,41 @@ function FindBestDoctor() {
   return (
     <div className="flex flex-col items-center justify-center p-4">
       {showAlert && (
-        <div
-          className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 m-5" role="alert"
-        >
-          <div>
-            There are a lot of {patientDetails.doctorType ? patientDetails.doctorType.toLowerCase() : 'doctor'}s in your area to choose from! Would you like me to do some research on them to filter it down to just a few?
-          </div>
-          <div>
-            <textarea
-              id="filter"
-              name="filter"
-              placeholder="How would you like me to filter the doctors? (e.g. 'I want doctors with high ratings, went to top medical schools, Asian, and handle contact lenses.')"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="p-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-            />
-            <button
-              className='bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded mt-2'
-              onClick={() => filterDoctors()}
-            >
-              Research doctors and filter them down for me
-            </button>
-          </div>
-        </div>
+        <FilterDoctorsCard
+          onFilterDoctors={filterDoctors} // Assuming filterDoctors is your function to apply filters
+          onTransportTypeChange={(selectedOption) => setTransportType(selectedOption)}
+          onTravelTimeChange={(selectedOption) => setTravelTime(selectedOption)}
+          onFilterChange={(e) => setFilter(e.target.value)}
+          transportType={transportType}
+          travelTime={travelTime}
+          filter={filter}
+        />
       )}
 
       <div className="mt-8">
-        <h2 className="text-lg font-semibold mb-4">Doctors to Call</h2>
-        <div
-          className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4"
-          style={{ maxWidth: '1000px' }}
-        >
-          <p>
-            Here are the doctors you've selected to call. You can drag and drop to reorder them. I will call them in the order you've selected, and will only move on to the next doctor only if I am unable to book an appointment with the current one.
-            I will be using your calendar to schedule appointments (I will take into account travel time), so please make sure it is up to date.
-
-          </p>
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-semibold mb-4">{patientDetails.doctorType ?? 'Doctor'}s to Call</h2>
+          <div
+            onClick={() => setIsHovering(!isHovering)}
+            className="cursor-pointer"
+          >
+            <FiInfo
+              // color
+              color={isHovering ? 'blue' : 'gray'}
+            /> {/* This is the question mark icon */}
+          </div>
         </div>
+        {isHovering && (
+          <div
+            className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4"
+            style={{ maxWidth: '1000px' }}
+          >
+            <p>
+              Here are the doctors you've selected to call. You can drag and drop to reorder them. I will call them in the order you've selected, and will only move on to the next doctor only if I am unable to book an appointment with the current one.
+              I will be using your calendar to schedule appointments (I will take into account travel time), so please make sure it is up to date.
+            </p>
+          </div>
+        )}
         {
           selectedDoctors.length === 0 && (
             <p className="text-gray-500">You haven't selected any doctors yet.</p>
@@ -290,14 +237,45 @@ function FindBestDoctor() {
             )}
           </Droppable>
         </DragDropContext>
-        <button className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 rounded mt-4" onClick={callDoctors}>Call Doctors</button>
+        {!calling ?
+          <button className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 rounded mt-4" onClick={callDoctors}>Call Doctors</button>
+          :
+          <div
+            className='flex items-center gap-2 bg-gray-100 p-4 rounded-lg shadow-md mt-4 cursor-pointer'
+          >
+            <div className='mr-5'>
+              <p className="text-lg font-semibold mb-2">Calling...</p>
+            </div>
+            <button
+              onClick={() => setIsModalVisible(true)}
+              className='text-white font-bold py-2 px-4 rounded bg-gray-500 hover:bg-gray-400 transition duration-150 ease-in-out flex items-center justify-center'
+            >
+              <span className="flex items-center">View Call Status
+                <FiPhoneCall
+                  className="text-green-500 ml-2" // Added margin-left for spacing
+                  size={24}
+                />
+              </span>
+            </button>
+
+            <button
+              className='text-white font-bold py-2 px-4 rounded bg-red-500 hover:bg-red-400 transition duration-150 ease-in-out flex items-center justify-center'
+              onClick={() => cancelCall()}
+            >
+              Cancel Call
+            </button>
+
+          </div>
+
+        }
+
       </div>
 
 
       <div className="mt-8"
         style={{ maxWidth: '1000px' }}
       >
-        <h2 className="text-lg font-semibold mb-4">Doctors in Your Area</h2>
+        <h2 className="text-lg font-semibold mb-4">{patientDetails.doctorType ?? 'Doctor'}s in Your Area</h2>
         <div className="flex flex-wrap -m-2">
           {insuranceData && insuranceData.length > 0 && insuranceData.map((doctor, index) => (
             <div key={index} className="p-2 flex-auto">
@@ -326,8 +304,8 @@ function FindBestDoctor() {
         onCancel={cancelCall}
         isVisible={isModalVisible}
         timer={timer}
-        userAvailability={userAvailability}
         callResults={callResults}
+        onClose={() => setIsModalVisible(false)}
       />
     </div >
   );
