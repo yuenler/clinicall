@@ -43,7 +43,20 @@ function FindBestDoctor() {
   }
 
   return (
-    <div></div>
+    <div className="flex flex-col items-center justify-center p-4">
+      <h1 className="text-xl font-bold mb-4">Here's what I found from what you've uploaded:</h1>
+      <div className="space-y-4">
+        {insuranceData && insuranceData.map((doctor, index) => (
+          <div key={index} className="border rounded-lg p-4 shadow-md">
+            <h2 className="text-lg font-semibold">{doctor.name}</h2>
+            <p>Specialty: {doctor.specialty}</p>
+            <p>Location: {doctor.location}</p>
+            <p>Phone: {doctor.phone}</p>
+            <p>{doctor.otherInfo}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
