@@ -13,6 +13,7 @@ export default function PatientInfo() {
   const [step, setStep] = useState(1);
   const [doctorType, setDoctorType] = useState(null);
   const [transportType, setTransportType] = useState(null);
+  const [deadline, setDeadline] = useState('');
 
   const { setWebsiteData, setPatientDetails } = useAppContext();
   const router = useRouter();
@@ -64,6 +65,7 @@ export default function PatientInfo() {
       transportType,
       patientRequest,
       doctorType,
+      deadline,
     };
     setPatientDetails(patientProfile);
     router.push('/findBestDoctor');
@@ -102,8 +104,24 @@ export default function PatientInfo() {
                   We recommend you see a <strong>{doctorType}</strong> based on your medical needs.
                 </div>
               )}
-              {/* <InsurancePageUploader onUploadComplete={onUploadComplete} /> */}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  What date do you need to see a doctor by?
+                </label>
+
+                <input
+                  type="date"
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
+                  className="p-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
+                />
+              </div>
+
               <div className="flex items-center mb-4">
+
+
+
                 <input
                   type="text"
                   placeholder="Home Address"
