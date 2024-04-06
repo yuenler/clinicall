@@ -11,6 +11,61 @@ const reorder = (list, startIndex, endIndex) => {
   result.splice(endIndex, 0, removed);
   return result;
 };
+function CallDoctorModal({ doctor, onCancel, isVisible, timer, userAvailability, callResults }) {
+  if (!isVisible) return null;
+
+  // Helper function to format dates
+  const formatDate = (date) => {
+    return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
+      <div className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center"
+        style={{ maxWidth: '400px', width: '90%' }}>
+        <h2 className="text-indigo-800 font-semibold text-xl mb-4">{doctor.name}</h2>
+
+        {userAvailability.length > 0 ? (
+          <>
+            <p className="text-sm text-gray-600 mb-2">Please verify that your availability is accurate before proceeding.</p>
+            <div className="bg-indigo-50 p-4 rounded-lg mb-4 w-full">
+              <p className="text-indigo-800 mb-2">Your available times:</p>
+              <ul className="list-disc pl-5 text-sm">
+                {userAvailability.map((availability, index) => (
+                  <li key={index} className="text-gray-700">
+                    {formatDate(availability.start)} - {formatDate(availability.end)}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </>
+        ) : (
+          <p className="text-gray-700 mb-2">Determining your availability based on your calendar and doctor's distance...</p>
+        )}
+
+        {userAvailability.length > 0 && timer > 0 && (
+          <p className="text-green-600 mb-2 font-semibold">Calling in {timer}...</p>
+        )}
+
+        {userAvailability.length > 0 && timer == 0 && callResults === "" && (
+          <p className="text-red-500 mb-2 font-semibold">Call ongoing...</p>
+        )}
+
+        {callResults && (
+          <p className="text-red-500 mb-2">{callResults}</p>
+        )}
+
+
+        <button
+          className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-6 rounded transition duration-150 ease-in-out"
+          onClick={onCancel}
+        >
+          Cancel Call
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function FindBestDoctor() {
   const [loading, setLoading] = useState(false);
@@ -19,6 +74,17 @@ function FindBestDoctor() {
   const [loadingText, setLoadingText] = useState('Searching for doctors...');
   const [filter, setFilter] = useState('');
   const [selectedDoctors, setSelectedDoctors] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentDoctorBeingCalled, setCurrentDoctorBeingCalled] = useState(null);
+  const [userAvailability, setUserAvailability] = useState([]);
+  const [timer, setTimer] = useState(10);
+  const [callResults, setCallResults] = useState('')
+
+
+
+  const cancelCall = () => {
+    setIsModalVisible(false);
+  };
 
   const router = useRouter();
 
@@ -73,22 +139,42 @@ function FindBestDoctor() {
 
   // function to call all doctors in the list in order here
   const callDoctors = async () => {
-    setLoadingText('Calling doctors...');
-    setLoading(true);
-    const response = await fetch('/api/call-doctors', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        selectedDoctors,
-        patientDetails,
-      }),
-    });
+    for (let i = 0; i < selectedDoctors.length; i++) {
+      setTimer(10);
+      setUserAvailability([]);
+      setCallResults('');
+      await handleCallDoctor(selectedDoctors[i]);
+    }
+  };
 
-    const data = await response.json();
-    console.log(data);
-    setLoading(false);
+  const handleCallDoctor = async (doctor) => {
+    setCurrentDoctorBeingCalled(doctor);
+    setIsModalVisible(true);
+
+    // wait 5 seconds to simulate getting user availability
+
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    setUserAvailability([
+      { start: '2024-10-01T09:00:00', end: '2024-10-01T10:00:00' },
+      { start: '2024-10-01T11:00:00', end: '2024-10-01T12:00:00' },
+    ]);
+
+    // wait 10 seconds to give user time to cancel the call, update timer
+
+    for (let i = 0; i < 10; i++) {
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setTimer((currentTimer) => currentTimer - 1);
+    }
+
+    // wait 10 seconds to simulate the call
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+
+    setCallResults('Unable to book an appointment with ' + doctor.name + '. Moving on to the next doctor...');
+
+    // wait 5 seconds to simulate a delay before moving on to the next doctor
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
   };
 
   const filterDoctors = async () => {
@@ -129,7 +215,7 @@ function FindBestDoctor() {
           className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 m-5" role="alert"
         >
           <div>
-            There are a lot of {patientDetails.doctorType.toLowerCase()}s in your area to choose from! Would you like me to do some research on them to filter it down to just a few?
+            There are a lot of {patientDetails.doctorType ? patientDetails.doctorType.toLowerCase() : 'doctor'}s in your area to choose from! Would you like me to do some research on them to filter it down to just a few?
           </div>
           <div>
             <textarea
@@ -151,7 +237,7 @@ function FindBestDoctor() {
       )}
 
       <div className="mt-8">
-        <h2 className="text-lg font-semibold mb-4">Doctors to Call (3 max)</h2>
+        <h2 className="text-lg font-semibold mb-4">Doctors to Call</h2>
         <div
           className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4"
           style={{ maxWidth: '1000px' }}
@@ -235,9 +321,14 @@ function FindBestDoctor() {
           ))}
         </div>
       </div>
-
-
-
+      <CallDoctorModal
+        doctor={currentDoctorBeingCalled}
+        onCancel={cancelCall}
+        isVisible={isModalVisible}
+        timer={timer}
+        userAvailability={userAvailability}
+        callResults={callResults}
+      />
     </div >
   );
 }
