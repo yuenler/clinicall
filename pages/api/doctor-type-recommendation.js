@@ -15,14 +15,16 @@ export default async function handler(req, res) {
 
   const { text } = req.body;
 
+
+
   const data = await new Promise(async (resolve, reject) => {
     try {
       const response = await openai.chat.completions.create({
         messages: [{
           role: 'user', content: `
-            Given this information, what kind of doctor should I see? Respond with only the doctor type, as a single word.
+          Given this information, what kind of doctor should I see? Respond with only the doctor type, as a single word.
             
-           Information:
+          Information:
           
           ${text}`
         }],
@@ -31,7 +33,7 @@ export default async function handler(req, res) {
       const responseText = response.choices[0].message.content
       console.log('OpenAI response:', responseText);
 
-      resolve(responseText);
+      resolve({ doctorType: responseText });
 
     } catch (error) {
       reject(error);

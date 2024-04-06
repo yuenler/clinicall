@@ -25,16 +25,17 @@ export default function PatientInfo() {
   // New function to handle fetching doctor type recommendation
   const fetchDoctorRecommendation = async () => {
     try {
-      const response = await fetch('doctor-type-recommendation', {
-        method: 'GET',
+      const response = await fetch('/api/doctor-type-recommendation', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           // Include other headers as needed
         },
+        body: JSON.stringify({ text: patientRequest }),
       });
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
-      setDoctorType(data); // Update doctorState with the response
+      setDoctorType(data.doctorType); // Update doctorState with the response
       setStep(2); // Move to the next step
     } catch (error) {
       console.error('There was an error fetching the doctor type recommendation:', error);
@@ -80,6 +81,13 @@ export default function PatientInfo() {
             </>
           ) : (
             <>
+              {
+                doctorType && (
+                  <div className="mb-4">
+                    We recommend you see a <strong>{doctorType}</strong> based on your medical needs.
+                  </div>
+                )
+              }
               <InsurancePageUploader onUploadComplete={onUploadComplete} />
               <Select
                 options={[]} // Populate this array dynamically
