@@ -7,6 +7,7 @@ function FindBestDoctor() {
   const [loading, setLoading] = useState(false);
   const { websiteData, insuranceData, setInsuranceData, patientDetails } = useAppContext();
   const [showAlert, setShowAlert] = useState(false);
+  const [loadingText, setLoadingText] = useState('Parsing your insurance website...');
 
   const router = useRouter();
 
@@ -53,11 +54,31 @@ function FindBestDoctor() {
     // Handle response here, e.g., show a success message
   };
 
+  const filterDoctors = async () => {
+    setLoadingText('Filtering down to the best doctors for you...');
+    setLoading(true);
+    const response = await fetch('/api/filter-doctors', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        insurance: insuranceData,
+        patientRequest: patientDetails.patientRequest,
+      }),
+    });
+
+    const data = await response.json();
+    setInsuranceData(data);
+    setLoading(false);
+    setShowAlert(false);
+  }
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="flex flex-col justify-center items-center">
-          <p className="text-lg font-semibold mb-2">Parsing your insurance website...</p>
+          <p className="text-lg font-semibold mb-2">{loadingText}</p>
           <ThreeDots color="#00BFFF" height={80} width={80} />
         </div>
       </div>
@@ -77,6 +98,7 @@ function FindBestDoctor() {
           <div>
             <button
               className='bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded mt-2'
+              onClick={() => filterDoctors()}
             >
               Research doctors and filter them down for me
             </button>
