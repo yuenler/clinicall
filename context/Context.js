@@ -7,7 +7,7 @@ export const useAppContext = () => useContext(AppContext);
 
 export const ContextProvider = ({ children }) => {
   const [insuranceData, setInsuranceData] = useState({});
-  const [profile, setProfile] = useState({});
+  const [patientDetails, setPatientDetails] = useState({});
   const [websiteData, setWebsiteData] = useState({});
 
 
@@ -15,8 +15,8 @@ export const ContextProvider = ({ children }) => {
     <AppContext.Provider value={{
       insuranceData,
       setInsuranceData,
-      profile,
-      setProfile,
+      patientDetails,
+      setPatientDetails,
       websiteData,
       setWebsiteData,
     }}>
