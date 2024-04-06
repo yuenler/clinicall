@@ -71,7 +71,25 @@ function FindBestDoctor() {
     setSelectedDoctors(prev => prev.filter((_, index) => index !== doctorIndex));
   };
 
-  // Optionally, implement a function to call all doctors in the list in order here
+  // function to call all doctors in the list in order here
+  const callDoctors = async () => {
+    setLoadingText('Calling doctors...');
+    setLoading(true);
+    const response = await fetch('/api/call-doctors', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        selectedDoctors,
+        patientDetails,
+      }),
+    });
+
+    const data = await response.json();
+    console.log(data);
+    setLoading(false);
+  };
 
   const filterDoctors = async () => {
     setLoadingText('Filtering down to the best doctors for you...');
@@ -133,7 +151,7 @@ function FindBestDoctor() {
       )}
 
       <div className="mt-8">
-        <h2 className="text-lg font-semibold mb-4">Doctors to Call</h2>
+        <h2 className="text-lg font-semibold mb-4">Doctors to Call (3 max)</h2>
         <div
           className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4"
           style={{ maxWidth: '1000px' }}
@@ -186,38 +204,43 @@ function FindBestDoctor() {
             )}
           </Droppable>
         </DragDropContext>
+        <button className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 rounded mt-4" onClick={callDoctors}>Call Doctors</button>
       </div>
 
 
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold mt-8">Doctors in Your Area</h2>
-
-        {insuranceData && insuranceData.length > 0 && insuranceData.map((doctor, index) => (
-          <div key={index} className="border rounded-lg p-4 shadow-md">
-            <h2 className="text-lg font-semibold">{doctor.name}</h2>
-            <p>Specialty: {doctor.specialty}</p>
-            <p>Location: {doctor.location}</p>
-            <p>Phone: {doctor.phone}</p>
-            <p>{doctor.otherInfo}</p>
-            {selectedDoctors.find(selectedDoctor => selectedDoctor.name === doctor.name) ? (
-              <button
-                className="mt-3 bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 rounded"
-                onClick={() => removeDoctorFromCallList(selectedDoctors.findIndex(selectedDoctor => selectedDoctor.name === doctor.name))}>-</button>
-            ) : (
-              <button
-                className="mt-3 bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 rounded"
-                onClick={() => addDoctorToCallList(doctor)}>+</button>
-            )}
-
-          </div>
-        ))}
+      <div className="mt-8"
+        style={{ maxWidth: '1000px' }}
+      >
+        <h2 className="text-lg font-semibold mb-4">Doctors in Your Area</h2>
+        <div className="flex flex-wrap -m-2">
+          {insuranceData && insuranceData.length > 0 && insuranceData.map((doctor, index) => (
+            <div key={index} className="p-2 flex-auto">
+              <div className="border rounded-lg p-4 shadow-md flex flex-col">
+                <h2 className="text-lg font-semibold">{doctor.name}</h2>
+                <p>Specialty: {doctor.specialty}</p>
+                <p>Location: {doctor.location}</p>
+                <p>Phone: {doctor.phone}</p>
+                <p>{doctor.otherInfo}</p>
+                {selectedDoctors.find(selectedDoctor => selectedDoctor.name === doctor.name) ? (
+                  <button
+                    className="mt-3 bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 rounded self-start"
+                    onClick={() => removeDoctorFromCallList(selectedDoctors.findIndex(selectedDoctor => selectedDoctor.name === doctor.name))}>-</button>
+                ) : (
+                  <button
+                    className="mt-3 bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 rounded self-start"
+                    onClick={() => addDoctorToCallList(doctor)}>+</button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
+
 
 
     </div >
   );
 }
 
+
 export default FindBestDoctor
-
-
