@@ -10,53 +10,58 @@ function FilterDoctorsCard({
   filter }) {
   return (
     <div className="rounded-lg shadow-lg overflow-hidden" style={{ backgroundColor: '#f0f4f8' }}>
-      <div className="p-5">
+      <div className="p-5"
+      >
         <h3 className="text-lg font-medium text-gray-900">Help us narrow down your options:</h3>
-        <div className="mt-2">
-          <label htmlFor="transportType" className="block text-sm font-medium text-gray-700">
-            Your preferred transport:
-          </label>
-          <Select
-            id="transportType"
-            className="mt-1"
-            options={[
-              { value: 'car', label: 'Car' },
-              { value: 'publicTransport', label: 'Public Transport' },
-              { value: 'bike', label: 'Bike' },
-              { value: 'walk', label: 'Walk' }
-            ]}
-            onChange={onTransportTypeChange}
-            value={transportType}
-            placeholder="Select transport type"
-            isClearable
-            isSearchable
-          />
-        </div>
-        <div className="mt-4">
-          <label htmlFor="travelTime" className="block text-sm font-medium text-gray-700">
-            Travel time
-          </label>
-          <Select
-            id="travelTime"
-            className="mt-1"
-            options={[
-              { value: '15', label: '15 minutes' },
-              { value: '30', label: '30 minutes' },
-              { value: '45', label: '45 minutes' },
-              { value: '60', label: '60 minutes' },
-              { value: '75', label: '75 minutes' },
-              { value: '90', label: '90 minutes' }
-            ]}
-            onChange={onTravelTimeChange}
-            value={travelTime}
-            placeholder="Select max travel time"
-            isClearable
-            isSearchable
-          />
+        <div
+          className='flex items-center gap-2'
+        >
+          <div className="mt-2">
+            <label htmlFor="transportType" className="block text-sm font-medium text-gray-700">
+              Your preferred transport:
+            </label>
+            <Select
+              id="transportType"
+              className="mt-1"
+              options={[
+                { value: 'car', label: 'Car' },
+                { value: 'publicTransport', label: 'Public Transport' },
+                { value: 'bike', label: 'Bike' },
+                { value: 'walk', label: 'Walk' }
+              ]}
+              onChange={onTransportTypeChange}
+              value={transportType}
+              placeholder="Select transport type"
+              isClearable
+              isSearchable
+            />
+          </div>
+          <div className="mt-2">
+            <label htmlFor="travelTime" className="block text-sm font-medium text-gray-700">
+              Travel time
+            </label>
+            <Select
+              id="travelTime"
+              className="mt-1"
+              options={[
+                { value: '15', label: '15 minutes' },
+                { value: '30', label: '30 minutes' },
+                { value: '45', label: '45 minutes' },
+                { value: '60', label: '60 minutes' },
+                { value: '75', label: '75 minutes' },
+                { value: '90', label: '90 minutes' }
+              ]}
+              onChange={onTravelTimeChange}
+              value={travelTime}
+              placeholder="Select max travel time"
+              isClearable
+              isSearchable
+            />
+          </div>
         </div>
         <div className="mt-4">
           <label htmlFor="doctorPreferences" className="block text-sm font-medium text-gray-700">
-            Your preferences (doctor education, gender, ethnicity, etc.)
+            Your preferences (doctor education, gender, ethnicity, ratings, specialty etc.)
           </label>
           <textarea
             id="doctorPreferences"
