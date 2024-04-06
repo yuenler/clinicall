@@ -101,11 +101,11 @@ function FindBestDoctor() {
     for (let i = 0; i < selectedDoctors.length; i++) {
       setTimer(10);
       setCallResults('');
-      await handleCallDoctor(selectedDoctors[i]);
+      await handleCallDoctor(selectedDoctors[i], i === selectedDoctors.length - 1);
     }
   };
 
-  const handleCallDoctor = async (doctor) => {
+  const handleCallDoctor = async (doctor, isLast) => {
     setCurrentDoctorBeingCalled(doctor);
 
 
@@ -119,7 +119,24 @@ function FindBestDoctor() {
     // wait 10 seconds to simulate the call
     await new Promise((resolve) => setTimeout(resolve, 10000));
 
-    setCallResults('Unable to book an appointment with ' + doctor.name + '. Moving on to the next doctor...');
+
+    if (isLast) {
+      // set call results to be the information of the doctor
+      setCallResults({
+        name: doctor.name,
+        phone: doctor.phone,
+        booked: true,
+        appointmentDate: 'Monday, August 23, 2021',
+        appointmentTime: '10:00 AM',
+      });
+      setCalling(false);
+    } else {
+      setCallResults({
+        name: doctor.name,
+        phone: doctor.phone,
+        booked: false,
+      });
+    }
 
     // wait 5 seconds to simulate a delay before moving on to the next doctor
     await new Promise((resolve) => setTimeout(resolve, 5000));
