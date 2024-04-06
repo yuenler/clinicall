@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     apiKey: process.env['OPENAI_API_KEY'],
   });
 
-  const { insurance, patientRequest } = req.body;
+  const { insurance, patientDetails } = req.body;
 
 
 

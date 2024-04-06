@@ -6,6 +6,7 @@ import { useAppContext } from '../context/Context';
 export default function PatientInfo() {
   const [homeAddress, setHomeAddress] = useState('');
   const [workAddress, setWorkAddress] = useState('');
+  const [workHours, setWorkHours] = useState('');
   const [patientRequest, setPatientRequest] = useState('');
   const [step, setStep] = useState(1);
   const [doctorType, setDoctorType] = useState(null);
@@ -56,6 +57,7 @@ export default function PatientInfo() {
     const patientProfile = {
       homeAddress,
       workAddress,
+      workHours,
       patientRequest,
     };
     setPatientDetails(patientProfile);
@@ -126,7 +128,7 @@ export default function PatientInfo() {
                   type="text"
                   placeholder="Work hours"
                   value={workAddress}
-                  onChange={(e) => setWorkAddress(e.target.value)}
+                  onChange={(e) => setWorkHours(e.target.value)}
                   className="p-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
                 />
               </div>

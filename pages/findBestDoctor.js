@@ -64,7 +64,7 @@ function FindBestDoctor() {
       },
       body: JSON.stringify({
         insurance: insuranceData,
-        patientRequest: patientDetails.patientRequest,
+        patientDetails,
       }),
     });
 
