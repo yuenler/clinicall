@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import Select from 'react-select';
 import InsurancePageUploader from '../components/InsurancePageUploader';
 import { useAppContext } from '../context/Context';
 
 export default function PatientInfo() {
-  const [homeAddress, setHomeAddress] = useState(null);
-  const [workAddress, setWorkAddress] = useState(null);
+  const [homeAddress, setHomeAddress] = useState('');
+  const [workAddress, setWorkAddress] = useState('');
   const [patientRequest, setPatientRequest] = useState('');
-  const [step, setStep] = useState(1); // New state variable to manage the step
-  const [doctorType, setDoctorType] = useState(null); // State variable to hold the doctor's state
+  const [step, setStep] = useState(1);
+  const [doctorType, setDoctorType] = useState(null);
 
   const { setWebsiteData, setPatientDetails } = useAppContext();
   const router = useRouter();
@@ -18,25 +17,35 @@ export default function PatientInfo() {
     setWebsiteData(data);
   };
 
-  const handleUseCurrentLocation = () => {
-    // Placeholder function
+  const handleUseCurrentLocation = (homeOrWork) => {
+    if (homeOrWork === 'home') setHomeAddress('Getting location...');
+    else setWorkAddress('Getting location...');
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const coords = `(${position.coords.latitude}, ${position.coords.longitude})`;
+        if (homeOrWork === 'home') setHomeAddress(coords);
+        else setWorkAddress(coords);
+      }, () => {
+        alert('Error getting location');
+      });
+    } else {
+      alert('Geolocation is not supported by this browser.');
+    }
   };
 
-  // New function to handle fetching doctor type recommendation
   const fetchDoctorRecommendation = async () => {
     try {
       const response = await fetch('/api/doctor-type-recommendation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Include other headers as needed
         },
         body: JSON.stringify({ text: patientRequest }),
       });
       if (!response.ok) throw new Error('Network response was not ok');
       const data = await response.json();
-      setDoctorType(data.doctorType); // Update doctorState with the response
-      setStep(2); // Move to the next step
+      setDoctorType(data.doctorType);
+      setStep(2);
     } catch (error) {
       console.error('There was an error fetching the doctor type recommendation:', error);
     }
@@ -45,10 +54,9 @@ export default function PatientInfo() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const patientProfile = {
-      homeAddress: homeAddress ? homeAddress.value : '',
-      workAddress: workAddress ? workAddress.value : '',
+      homeAddress,
+      workAddress,
       patientRequest,
-      // Consider including doctorState in patientProfile if needed
     };
     setPatientDetails(patientProfile);
     router.push('/findBestDoctor');
@@ -81,35 +89,70 @@ export default function PatientInfo() {
             </>
           ) : (
             <>
-              {
-                doctorType && (
-                  <div className="mb-4">
-                    We recommend you see a <strong>{doctorType}</strong> based on your medical needs.
-                  </div>
-                )
-              }
+              {doctorType && (
+                <div className="mb-4">
+                  We recommend you see a <strong>{doctorType}</strong> based on your medical needs.
+                </div>
+              )}
               <InsurancePageUploader onUploadComplete={onUploadComplete} />
-              <Select
-                options={[]} // Populate this array dynamically
-                onChange={setHomeAddress}
-                placeholder="Select Home Address"
-                isClearable
-                className="mb-4"
-              />
-              <Select
-                options={[]} // Populate this array dynamically
-                onChange={setWorkAddress}
-                placeholder="Select Work Address"
-                isClearable
-                className="mb-4"
-              />
-              <button
-                type="button"
-                className="mb-4 w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
-                onClick={handleUseCurrentLocation}
-              >
-                Use Current Location
-              </button>
+              <div className="flex items-center mb-4">
+                <input
+                  type="text"
+                  placeholder="Home Address"
+                  value={homeAddress}
+                  onChange={(e) => setHomeAddress(e.target.value)}
+                  className="p-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleUseCurrentLocation('home')}
+                  className="p-2 border border-transparent text-sm font-medium rounded-r-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+                  style={{ marginLeft: "-1px" }} // This helps visually connect the button to the input
+                >
+                  <svg className="w-6 h-</div>6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 2C8.13401 2 5 5.13401 5 9c0 5 7 13 7 13s7-8 7-13c0-3.866-3.134-7-7-7z" />
+                    <circle cx="12" cy="9" r="3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                  </svg>
+                </button>
+              </div>
+
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  When do you work? (Example response: Mon-Thurs 9-5, but I leave early at 3 on Fridays)
+                </label>
+
+                <input
+                  type="text"
+                  placeholder="Work hours"
+                  value={workAddress}
+                  onChange={(e) => setWorkAddress(e.target.value)}
+                  className="p-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
+                />
+              </div>
+
+              <div className="flex items-center mb-4">
+                <input
+                  type="text"
+                  placeholder="Work Address"
+                  value={workAddress}
+                  onChange={(e) => setWorkAddress(e.target.value)}
+                  className="p-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleUseCurrentLocation('work')}
+                  className="p-2 border border-transparent text-sm font-medium rounded-r-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+                  style={{ marginLeft: "-1px" }} // This helps visually connect the button to the input
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 2C8.13401 2 5 5.13401 5 9c0 5 7 13 7 13s7-8 7-13c0-3.866-3.134-7-7-7z" />
+                    <circle cx="12" cy="9" r="3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+                  </svg>
+
+                </button>
+              </div>
+
               <button
                 type="submit"
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-gray-800 bg-blue-200 hover:bg-blue-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-300"
