@@ -9,6 +9,7 @@ export const ContextProvider = ({ children }) => {
   const [insuranceData, setInsuranceData] = useState([]);
   const [patientDetails, setPatientDetails] = useState({});
   const [websiteData, setWebsiteData] = useState({});
+  const [userCalendar, setUserCalendar] = useState({});
 
 
   return (
@@ -19,6 +20,8 @@ export const ContextProvider = ({ children }) => {
       setPatientDetails,
       websiteData,
       setWebsiteData,
+      userCalendar,
+      setUserCalendar,
     }}>
       {children}
     </AppContext.Provider>

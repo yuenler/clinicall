@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { initializeApp } from "firebase/app";
+import { useAppContext } from '../context/Context';
+
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -33,6 +34,9 @@ export async function getCalendarItems(body) {
 }
 
 export default function Home() {
+
+  const { setUserCalendar } = useAppContext();
+
   const router = useRouter();
 
   useEffect(async () => {
@@ -53,28 +57,32 @@ export default function Home() {
       ux_mode: "popup",
       callback: async (response) => {
         // Send response.code to your backend
-        await getCalendarItems(JSON.stringify({ code: response.code }));
+        const calendarEvents = await getCalendarItems(JSON.stringify({ code: response.code }));
+        setUserCalendar(calendarEvents);
       },
     });
     await client.requestCode();
 
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-green-500 to-teal-500">
-        <div className="text-center">
-          <h1 className="text-6xl font-bold text-white mb-4">
-            Welcome to the Patient Booker.
-          </h1>
-          <p className="text-xl text-white mb-8">
-            Book appointments with your doctor automatically with AI.
-          </p>
-          <button
-            onClick={handleSignIn}
-            className="bg-white text-gray-800 font-semibold py-2 px-4 border border-transparent rounded-lg shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-400 transition duration-150 ease-in-out"
-          >
-            Sign up with Google
-          </button>
-        </div>
+    router.push("/profile");
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-green-500 to-teal-500">
+      <div className="text-center">
+        <h1 className="text-6xl font-bold text-white mb-4">
+          Welcome to the Patient Booker.
+        </h1>
+        <p className="text-xl text-white mb-8">
+          Book appointments with your doctor automatically with AI.
+        </p>
+        <button
+          onClick={handleSignIn}
+          className="bg-white text-gray-800 font-semibold py-2 px-4 border border-transparent rounded-lg shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-400 transition duration-150 ease-in-out"
+        >
+          Sign up with Google
+        </button>
       </div>
-    );
-  };
+    </div>
+  );
+
 }
