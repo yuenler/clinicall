@@ -6,6 +6,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { FiInfo, FiPhoneCall } from 'react-icons/fi'; // Importing an info icon from react-icons
 import CallDoctorModal from './components/CallDoctorModal';
 import FilterDoctorsCard from './components/FilterDoctorsCard';
+import FinalResultsModal from './components/FinalResultsModal';
 
 // Function to help reorder the list
 const reorder = (list, startIndex, endIndex) => {
@@ -25,11 +26,13 @@ function FindBestDoctor() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentDoctorBeingCalled, setCurrentDoctorBeingCalled] = useState(null);
   const [timer, setTimer] = useState(10);
-  const [callResults, setCallResults] = useState('')
+  const [callResults, setCallResults] = useState([])
   const [isHovering, setIsHovering] = useState(false);
   const [transportType, setTransportType] = useState(null);
   const [travelTime, setTravelTime] = useState(null);
   const [calling, setCalling] = useState(false);
+  const [activelyCalling, setActivelyCalling] = useState(false);
+  const [displayFinalResultsModal, setDisplayFinalResultsModal] = useState(false);
 
   const cancelCall = () => {
     const confirmation = confirm('Are you sure you want to cancel the call? This will hang up on the current doctor office it is calling.');
@@ -98,10 +101,12 @@ function FindBestDoctor() {
       return;
     }
     setCalling(true);
+    const cResults = []
     for (let i = 0; i < selectedDoctors.length; i++) {
       setTimer(10);
-      setCallResults('');
-      await handleCallDoctor(selectedDoctors[i], i === selectedDoctors.length - 1);
+      const results = await handleCallDoctor(selectedDoctors[i], i === selectedDoctors.length - 1);
+      cResults.push(results);
+      setCallResults([...cResults]);
     }
   };
 
@@ -116,30 +121,36 @@ function FindBestDoctor() {
       setTimer((currentTimer) => currentTimer - 1);
     }
 
+
+    setActivelyCalling(true);
     // wait 10 seconds to simulate the call
     await new Promise((resolve) => setTimeout(resolve, 10000));
 
+    setActivelyCalling(false);
 
+
+    let results;
     if (isLast) {
       // set call results to be the information of the doctor
-      setCallResults({
+      results = {
         name: doctor.name,
         phone: doctor.phone,
         booked: true,
         appointmentDate: 'Monday, August 23, 2021',
         appointmentTime: '10:00 AM',
-      });
+      }
       setCalling(false);
+      setDisplayFinalResultsModal(true);
     } else {
-      setCallResults({
+      // set call results to be the information of the doctor
+      results = {
         name: doctor.name,
         phone: doctor.phone,
         booked: false,
-      });
+      }
     }
 
-    // wait 5 seconds to simulate a delay before moving on to the next doctor
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    return results;
 
   };
 
@@ -323,7 +334,16 @@ function FindBestDoctor() {
         timer={timer}
         callResults={callResults}
         onClose={() => setIsModalVisible(false)}
+        activelyCalling={activelyCalling}
       />
+
+      <FinalResultsModal
+        isVisible={displayFinalResultsModal}
+        callResults={callResults}
+        onClose={() => setDisplayFinalResultsModal(false)}
+      />
+
+
     </div >
   );
 }

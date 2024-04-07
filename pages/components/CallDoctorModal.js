@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react';
 
-function CallDoctorModal({ doctor, onCancel, onClose, isVisible, timer, callResults }) {
+function CallDoctorModal({ doctor, onCancel, onClose, isVisible, timer, callResults, activelyCalling }) {
   if (!isVisible) return null;
 
   return (
@@ -12,26 +13,33 @@ function CallDoctorModal({ doctor, onCancel, onClose, isVisible, timer, callResu
           <p className="text-green-600 mb-2 font-semibold">Calling in {timer}...</p>
         )}
 
-        {timer == 0 && callResults === "" && (
+        {activelyCalling && (
           <p className="text-red-500 mb-2 font-semibold">Call ongoing...</p>
         )}
 
-        {callResults && callResults.booked === true && (
-          <p className="text-green-600 mb-2 font-semibold">Appointment booked at {callResults.appointmentDate} at {callResults.appointmentTime} with {callResults.name}.
-          </p>
+        {callResults.length > 0 && (
+          <div>
+            <h2
+              className='text-indigo-800 font-semibold text-lg mb-2 mt-4'
+            >Call results:</h2>
+            {callResults.map((result, index) => (
+              <div key={index}>
+                {result.booked === true && (
+                  <p className="text-green-600 mb-2 font-semibold">
+                    Appointment booked at {result.appointmentDate} at {result.appointmentTime} with {result.name}.
+                  </p>
+                )}
+                {result.booked === false && (
+                  <p className="text-red-500 mb-2 font-semibold">
+                    Unable to book appointment with {result.name}.
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
         )}
 
-        {callResults && callResults.booked === false && (
-          <p className="text-red-500 mb-2 font-semibold">
-            Unable to book appointment with {callResults.name}.
-          </p>
-        )}
-
-
-
-        <div
-          className='flex items-center gap-2'
-        >
+        <div className='flex items-center gap-2'>
           <button
             className="mt-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded transition duration-150 ease-in-out"
             onClick={onClose}
