@@ -6,8 +6,8 @@ import Select from 'react-select';
 
 export default function PatientInfo() {
   const [patientInfo, setPatientInfo] = useState({
-    name: 'Samantha Li',
-    email: 'samanthali@gmail.com',
+    name: 'Sam Li',
+    email: 'samli@gmail.com',
     phone: '555-555-5555',
     insurance: 'Blue Cross Blue Shield',
     network: 'Medicare HMO Blue',
