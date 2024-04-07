@@ -3,10 +3,11 @@ import { useAppContext } from '../context/Context';
 import { ThreeDots } from 'react-loader-spinner';
 import { useRouter } from 'next/router';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { FiInfo, FiPhoneCall } from 'react-icons/fi'; // Importing an info icon from react-icons
+import { FiInfo, FiPhoneCall, FiStar } from 'react-icons/fi'; // Importing an info icon from react-icons
 import CallDoctorModal from './components/CallDoctorModal';
 import FilterDoctorsCard from './components/FilterDoctorsCard';
 import FinalResultsModal from './components/FinalResultsModal';
+import { FaStar } from 'react-icons/fa'; // Importing a star icon from react-icons
 
 // Function to help reorder the list
 const reorder = (list, startIndex, endIndex) => {
@@ -312,11 +313,15 @@ function FindBestDoctor() {
                 <p>Specialty: {doctor.specialty}</p>
                 <p>Location: {doctor.location}</p>
                 <p>Phone: {doctor.phone}</p>
-                {
-                  doctor.rating && (
-                    <p>Google rating: {doctor.rating}</p>
-                  )
-                }
+                {doctor.rating && (
+                  <div className="flex items-center">
+                    <p>Google rating:</p>
+                    {Array.from({ length: Math.round(doctor.rating) }, (_, index) => (
+                      <FaStar key={index} className="text-yellow-500 ml-1"
+                      />
+                    ))}
+                  </div>
+                )}
                 {selectedDoctors.find(selectedDoctor => selectedDoctor.name === doctor.name) ? (
                   <button
                     className="mt-3 bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 rounded self-start"

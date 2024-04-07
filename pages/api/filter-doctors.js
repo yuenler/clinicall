@@ -34,7 +34,10 @@ export default async function handler(req, res) {
           ratings.push(0);
         }
       }
-      // const response = await fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=pinocchios& key=${process.env.GOOGLE_API_KEY} `);
+
+      // const pizza = "Eiffel tower";
+      // // const response = await fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${pizza}&key=${process.env.GOOGLE_API_KEY}`);
+      // const response = await fetch(`https://places.googleapis.com/v1/places:searchText?query=${pizza}&key=${process.env.GOOGLE_API_KEY}`);
       // console.log((await response.json()));
 
       // sort the doctors by their rating, and add the rating to the doctor object
