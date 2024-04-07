@@ -7,12 +7,12 @@ import Select from 'react-select';
 export default function PatientInfo() {
   const [patientInfo, setPatientInfo] = useState({
     name: 'Sam Li',
-    email: 'samli@gmail.com',
-    phone: '555-555-5555',
+    email: 'sam_li@gmail.com',
+    phone: '608-585-5125',
     insurance: 'Blue Cross Blue Shield',
     network: 'Medicare HMO Blue',
-    policyGroupNumber: '123456',
-    planIDNumber: '654321',
+    policyGroupNumber: '1230382456',
+    planIDNumber: '6547931821',
     homeAddress: '123 Main St, Boston, MA',
     workAddress: '456 Elm St, Boston, MA',
   });
