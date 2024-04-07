@@ -216,7 +216,7 @@ export default function PatientInfo() {
                       type="text"
                       placeholder="Work Address"
                       value={
-                        patientInfo.workAddresss
+                        patientInfo.workAddress
                       }
                       onChange={(e) => setPatientInfo({ ...patientInfo, workAddress: e.target.value })}
                       className="p-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
