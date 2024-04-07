@@ -104,7 +104,7 @@ function FindBestDoctor() {
     setCalling(true);
     const cResults = []
     for (let i = 0; i < selectedDoctors.length; i++) {
-      setTimer(1);
+      setTimer(3);
       const results = await handleCallDoctor(selectedDoctors[i], i === selectedDoctors.length - 1);
       cResults.push(results);
       setCallResults([...cResults]);
