@@ -312,7 +312,6 @@ function FindBestDoctor() {
                 <p>Specialty: {doctor.specialty}</p>
                 <p>Location: {doctor.location}</p>
                 <p>Phone: {doctor.phone}</p>
-                <p>{doctor.otherInfo}</p>
                 {selectedDoctors.find(selectedDoctor => selectedDoctor.name === doctor.name) ? (
                   <button
                     className="mt-3 bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 rounded self-start"
