@@ -66,6 +66,51 @@ export default function PatientInfo() {
             step == 0 && (
               <div>
                 <div className='mt-4'>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Your name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    value={
+                      patientInfo.name
+                    }
+                    onChange={(e) => setPatientInfo({ ...patientInfo, name: e.target.value })}
+                    className="p-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
+                  />
+                </div>
+                <div className='mt-4'>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Email"
+                    value={
+                      patientInfo.email
+                    }
+                    onChange={(e) => setPatientInfo({ ...patientInfo, email: e.target.value })}
+                    className="p-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
+                  />
+                </div>
+
+                <div className='mt-4'>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone number
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Phone number"
+                    value={
+                      patientInfo.phone
+                    }
+                    onChange={(e) => setPatientInfo({ ...patientInfo, phone: e.target.value })}
+                    className="p-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-l-md"
+                  />
+                </div>
+
+
+                <div className='mt-4'>
                   <Select
                     options={[
                       { value: 'Aetna', label: 'Aetna' },

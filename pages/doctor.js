@@ -125,7 +125,30 @@ function FindBestDoctor() {
 
     setActivelyCalling(true);
     // wait 10 seconds to simulate the call
-    await new Promise((resolve) => setTimeout(resolve, 10000));
+
+    const response = await fetch('/api/call-doctor', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        doctorName: doctor.name,
+        patientDetails,
+      }),
+    });
+
+    console.log('response', response);
+
+    // Check if the request was successful
+    if (!response.ok) {
+      // If not, throw an error
+      throw new Error('Failed to call doctor');
+    }
+
+    // If the request was successful, parse the JSON response
+    const data = await response.json();
+    console.log(data);
+
 
     setActivelyCalling(false);
 
