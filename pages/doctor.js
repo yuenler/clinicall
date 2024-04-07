@@ -19,7 +19,7 @@ const reorder = (list, startIndex, endIndex) => {
 
 function FindBestDoctor() {
   const [loading, setLoading] = useState(false);
-  const { websiteData, insuranceData, setInsuranceData, patientDetails } = useAppContext();
+  const { websiteData, insuranceData, setInsuranceData, patientDetails, userCalendar } = useAppContext();
   const [showAlert, setShowAlert] = useState(false);
   const [loadingText, setLoadingText] = useState('Searching for doctors...');
   const [filter, setFilter] = useState('');
@@ -104,7 +104,7 @@ function FindBestDoctor() {
     setCalling(true);
     const cResults = []
     for (let i = 0; i < selectedDoctors.length; i++) {
-      setTimer(10);
+      setTimer(1);
       const results = await handleCallDoctor(selectedDoctors[i], i === selectedDoctors.length - 1);
       cResults.push(results);
       setCallResults([...cResults]);
@@ -148,7 +148,7 @@ function FindBestDoctor() {
 
     // If the request was successful, parse the JSON response
     const data = await response.json();
-    console.log(data);
+    console.log('data', data);
 
 
     setActivelyCalling(false);
@@ -163,6 +163,9 @@ function FindBestDoctor() {
         booked: true,
         appointmentTime: 'Monday, August 23, 2021 10:00 AM',
       }
+
+
+
       setCalling(false);
       setDisplayFinalResultsModal(true);
     } else {

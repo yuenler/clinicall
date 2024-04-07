@@ -19,17 +19,17 @@ export default async function handler(req, res) {
 
   const data = await new Promise(async (resolve, reject) => {
     try {
-
       const params = new URLSearchParams({
-        phone_number: '+18334952804',
-        port: 80,
+        phone_number: '+18472121849',
+        port: 8080,
         start_ngrok: false,
         remote_host: 'localhost',
         doctorName,
         patientName: patientDetails.name,
-        availableTimes: JSON.stringify(userCalendar),
+        userCalendar: JSON.stringify(userCalendar),
         insuranceName: patientDetails.insurance,
-        patientSymptoms: patientDetails.patientRequest
+        patientSymptoms: patientDetails.patientRequest,
+        deadline: patientDetails.deadline,
       });
 
       console.log(params.toString());

@@ -5,12 +5,21 @@ import Select from 'react-select';
 
 
 export default function PatientInfo() {
-  const [patientInfo, setPatientInfo] = useState({});
+  const [patientInfo, setPatientInfo] = useState({
+    name: 'Samantha Li',
+    email: 'samanthali@gmail.com',
+    phone: '555-555-5555',
+    insurance: 'Blue Cross Blue Shield',
+    network: 'Medicare HMO Blue',
+    policyGroupNumber: '123456',
+    planIDNumber: '654321',
+    homeAddress: '123 Main St, Boston, MA',
+    workAddress: '456 Elm St, Boston, MA',
+  });
   const [step, setStep] = useState(0);
 
   const { setPatientDetails } = useAppContext();
   const router = useRouter();
-
 
   const handleUseCurrentLocation = (homeOrWork) => {
     if (homeOrWork === 'home') setPatientInfo({ ...patientInfo, homeAddress: 'Getting location...' });
