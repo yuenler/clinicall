@@ -20,15 +20,34 @@ export default async function handler(req, res) {
   const data = await new Promise(async (resolve, reject) => {
     try {
 
-      // temporary response, return a random sample of 5 doctors from the insurance data
-      const shuffledInsuranceData = insurance.sort(() => Math.random() - 0.5);
-      const data = shuffledInsuranceData.slice(0, 5);
+      const ratings = []
 
-      // wait 5 seconds to simulate a slow response
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+      // iterate through each doctor in the insurance data and check their reviews on google
+      for (const doctor of insurance) {
+        const response = await fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${doctor.name}&key=${process.env.GOOGLE_API_KEY}`);
+        const data = await response.json();
+        if (data.results.length > 0) {
+          const rating = data.results[0].rating;
+          ratings.push(rating);
+        }
+        else {
+          ratings.push(0);
+        }
+      }
+      // const response = await fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=pinocchios& key=${process.env.GOOGLE_API_KEY} `);
+      // console.log((await response.json()));
 
+      // sort the doctors by their rating, and add the rating to the doctor object
+      const sortedDoctors = insurance.map((doctor, index) => {
+        return {
+          ...doctor,
+          rating: ratings[index]
+        }
+      }).sort((a, b) => b.rating - a.rating);
 
-      resolve(data);
+      // get top 10 doctors
+
+      resolve(sortedDoctors.slice(0, 5));
 
     } catch (error) {
       reject(error);

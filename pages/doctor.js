@@ -312,6 +312,11 @@ function FindBestDoctor() {
                 <p>Specialty: {doctor.specialty}</p>
                 <p>Location: {doctor.location}</p>
                 <p>Phone: {doctor.phone}</p>
+                {
+                  doctor.rating && (
+                    <p>Google rating: {doctor.rating}</p>
+                  )
+                }
                 {selectedDoctors.find(selectedDoctor => selectedDoctor.name === doctor.name) ? (
                   <button
                     className="mt-3 bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 rounded self-start"
@@ -321,6 +326,7 @@ function FindBestDoctor() {
                     className="mt-3 bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 rounded self-start"
                     onClick={() => addDoctorToCallList(doctor)}>+</button>
                 )}
+
               </div>
             </div>
           ))}
@@ -335,7 +341,6 @@ function FindBestDoctor() {
         onClose={() => setIsModalVisible(false)}
         activelyCalling={activelyCalling}
       />
-
       <FinalResultsModal
         isVisible={displayFinalResultsModal}
         callResults={callResults}
