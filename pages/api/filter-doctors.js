@@ -25,6 +25,7 @@ export default async function handler(req, res) {
       // iterate through each doctor in the insurance data and check their reviews on google
       for (const doctor of insurance) {
         const response = await fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${doctor.name}&key=${process.env.GOOGLE_API_KEY}`);
+
         const data = await response.json();
         if (data.results.length > 0) {
           const rating = data.results[0].rating;
@@ -36,7 +37,7 @@ export default async function handler(req, res) {
       }
 
       // const pizza = "Eiffel tower";
-      // // const response = await fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${pizza}&key=${process.env.GOOGLE_API_KEY}`);
+      // const response = await fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${pizza}&key=${process.env.GOOGLE_API_KEY}`);
       // const response = await fetch(`https://places.googleapis.com/v1/places:searchText?query=${pizza}&key=${process.env.GOOGLE_API_KEY}`);
       // console.log((await response.json()));
 
@@ -49,7 +50,6 @@ export default async function handler(req, res) {
       }).sort((a, b) => b.rating - a.rating);
 
       // get top 10 doctors
-
       resolve(sortedDoctors.slice(0, 5));
 
     } catch (error) {

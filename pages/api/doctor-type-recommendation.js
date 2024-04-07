@@ -19,6 +19,7 @@ export default async function handler(req, res) {
 
   const data = await new Promise(async (resolve, reject) => {
     try {
+      console.log('text:', text);
       const response = await openai.chat.completions.create({
         messages: [{
           role: 'user', content: `
