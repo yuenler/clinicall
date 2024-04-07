@@ -11,12 +11,9 @@ export default function PatientInfo() {
   const [doctorType, setDoctorType] = useState(null);
   const [deadline, setDeadline] = useState('');
 
-  const { setWebsiteData, setPatientDetails } = useAppContext();
+  const { setPatientDetails } = useAppContext();
   const router = useRouter();
 
-  const onUploadComplete = (data) => {
-    setWebsiteData(data);
-  };
 
   const handleUseCurrentLocation = (homeOrWork) => {
     if (homeOrWork === 'home') setHomeAddress('Getting location...');
