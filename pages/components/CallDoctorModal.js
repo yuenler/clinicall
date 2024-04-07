@@ -26,7 +26,7 @@ function CallDoctorModal({ doctor, onCancel, onClose, isVisible, timer, callResu
               <div key={index}>
                 {result.booked === true && (
                   <p className="text-green-600 mb-2 font-semibold">
-                    Appointment booked at {result.appointmentDate} at {result.appointmentTime} with {result.name}.
+                    Appointment booked at {result.appointmentTime} with {result.name}.
                   </p>
                 )}
                 {result.booked === false && (

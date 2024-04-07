@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     apiKey: process.env['OPENAI_API_KEY'],
   });
 
-  const { doctorName, patientDetails } = req.body;
+  const { doctorName, patientDetails, userCalendar } = req.body;
 
 
 
@@ -27,8 +27,7 @@ export default async function handler(req, res) {
         remote_host: 'localhost',
         doctorName,
         patientName: patientDetails.name,
-        // Note: availableTimes is an array and needs special handling if you're passing it through a query string.
-        availableTimes: JSON.stringify([]), // Assuming you want to pass it as a JSON string
+        availableTimes: JSON.stringify(userCalendar),
         insuranceName: patientDetails.insurance,
         patientSymptoms: patientDetails.patientRequest
       });

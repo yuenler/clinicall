@@ -134,6 +134,7 @@ function FindBestDoctor() {
       body: JSON.stringify({
         doctorName: doctor.name,
         patientDetails,
+        userCalendar
       }),
     });
 
@@ -160,8 +161,7 @@ function FindBestDoctor() {
         name: doctor.name,
         phone: doctor.phone,
         booked: true,
-        appointmentDate: 'Monday, August 23, 2021',
-        appointmentTime: '10:00 AM',
+        appointmentTime: 'Monday, August 23, 2021 10:00 AM',
       }
       setCalling(false);
       setDisplayFinalResultsModal(true);

@@ -57,6 +57,7 @@ export default function Home() {
       callback: async (response) => {
         // Send response.code to your backend
         const calendarEvents = await getCalendarItems(JSON.stringify({ code: response.code }));
+        console.log(calendarEvents);
         setUserCalendar(calendarEvents);
       },
     });
